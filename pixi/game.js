@@ -24,7 +24,9 @@ document.body.appendChild(renderer.view);
 
 // Create a container object called the `stage`
 var stage = new PIXI.Container();
-var countdown, timeDisplay;
+var timeDisplay, scoreDisplay, nameDisplay, playerCountDisplay, leaderboardDisplay;
+var countdown, score, name, playerCount, leaderboard; 
+var textColor = "0x375E53";
 
 function initialize(data){
 
@@ -36,25 +38,70 @@ function initialize(data){
 
 function resetBoard(data) {
   countdown = data.time;
+  name = data.player.uname;
+  playerCount = data.player_count;
+  score = data.player.score;
   DotsControl.drawGrid(data.board);
 }
 
 //TIME, SCORE, PLAYER COUNT, NAME CHANGE AND LEADERBOARD
 function initUI(){
 	timeDisplay = new PIXI.Text(
-			"Time: " + countdown.toString(),
-			{fontFamily: "Arial", fontSize: 32, fill: "black"}
-		);
+		"Time: " + countdown,
+		{fontFamily: "Arial", fontSize: 32, fill: textColor}
+	);
 
-	timeDisplay.position.set(54, 96);
+	timeDisplay.anchor.set(0.5, 0);
+  timeDisplay.position.set(window.innerWidth / 2, 20);
 	stage.addChild(timeDisplay);
 
-	ticker.add(function (time) {
+  scoreDisplay = new PIXI.Text(
+    "Score: " + score,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  scoreDisplay.anchor.set(1, 0);
+  scoreDisplay.position.set(window.innerWidth - 20, 20);
+  stage.addChild(scoreDisplay);
+
+  nameDisplay = new PIXI.Text(
+    "Name: " + name,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  nameDisplay.anchor.set(1);
+  nameDisplay.position.set(window.innerWidth - 20, window.innerHeight - 20);
+  stage.addChild(nameDisplay);
+
+  playerCountDisplay = new PIXI.Text(
+    "Player count: " + playerCount,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  playerCountDisplay.anchor.set(0, 1);
+  playerCountDisplay.position.set(20, window.innerHeight - 20);
+  stage.addChild(playerCountDisplay);
+
+  leaderboardDisplay = new PIXI.Text(
+    "Leaderboard: " + leaderboard,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  leaderboardDisplay.position.set(20, 20);
+  leaderboardDisplay.anchor.set(0,0);
+  stage.addChild(leaderboardDisplay);
+
+	ticker.add(function (deltaTime) {
 		// console.log(ticker.elapsedMS);
 		if(countdown > 0){
-			countdown = countdown - time*ticker.elapsedMS/1000;
+			countdown = countdown - deltaTime*ticker.elapsedMS/1000;
 			timeDisplay.text = "Time: " + Math.round(countdown);
 		}
+
+    playerCountDisplay.text = "Player count: " + playerCount;
+    scoreDisplay.text = "Score: " + score;
+
+
 		renderer.render(stage);
 	});
 }
