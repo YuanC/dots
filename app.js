@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
   socket.on('player_connect', () => { // e.g. "toronto"
 
     players[socket.id] = {'score': 0, 'uname': socket.id}
-    socket.emit('connectSuccess', {board, leaderboard, time, 'player': players[socket.id], 'player_count': Object.keys(players).length})
+    socket.emit('connect_success', {board, leaderboard, time, 'player': players[socket.id], 'player_count': Object.keys(players).length})
     socket.broadcast.emit('player_count_change', Object.keys(players).length)
     console.log('connections' + Object.keys(players).length)
 
