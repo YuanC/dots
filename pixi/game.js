@@ -1,5 +1,6 @@
 // Create the renderer
 var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, this.options);
+var ticker = new PIXI.ticker.Ticker();
 renderer.backgroundColor = 0xfffff0;
 renderer.view.style.position = "absolute";
 renderer.view.style.display = "block";
@@ -23,21 +24,96 @@ document.body.appendChild(renderer.view);
 
 // Create a container object called the `stage`
 var stage = new PIXI.Container();
-var dots = new PIXI.Container();
-stage.addChild(dots);
+var timeDisplay, scoreDisplay, nameDisplay, playerCountDisplay, leaderboardDisplay;
+var countdown, score, name, playerCount, leaderboard; 
+var textColor = "0x375E53";
 
-var line = new PIXI.Graphics();
+function initialize(data){
 
-line.beginFill(colorDict['0']);
-line.lineStyle(5, colorDict['0']);
-line.moveTo(25, 25);
-line.lineTo(50, 50);
-line.endFill();
-dots.addChild(line);
+  resetBoard(data);
+  initUI();
+	ticker.start();
+
+}
+
+function resetBoard(data) {
+  countdown = data.time;
+  name = data.player.uname;
+  playerCount = data.player_count;
+  score = data.player.score;
+  DotsControl.drawGrid(data.board);
+}
+
+//TIME, SCORE, PLAYER COUNT, NAME CHANGE AND LEADERBOARD
+function initUI(){
+	timeDisplay = new PIXI.Text(
+		"Time: " + countdown,
+		{fontFamily: "Arial", fontSize: 32, fill: textColor}
+	);
+
+	timeDisplay.anchor.set(0.5, 0);
+  timeDisplay.position.set(window.innerWidth / 2, 20);
+	stage.addChild(timeDisplay);
+
+  scoreDisplay = new PIXI.Text(
+    "Score: " + score,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  scoreDisplay.anchor.set(1, 0);
+  scoreDisplay.position.set(window.innerWidth - 20, 20);
+  stage.addChild(scoreDisplay);
+
+  nameDisplay = new PIXI.Text(
+    "Name: " + name,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  nameDisplay.anchor.set(1);
+  nameDisplay.position.set(window.innerWidth - 20, window.innerHeight - 20);
+  stage.addChild(nameDisplay);
+
+  playerCountDisplay = new PIXI.Text(
+    "Player count: " + playerCount,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  playerCountDisplay.anchor.set(0, 1);
+  playerCountDisplay.position.set(20, window.innerHeight - 20);
+  stage.addChild(playerCountDisplay);
+
+  leaderboardDisplay = new PIXI.Text(
+    "Leaderboard: " + leaderboard,
+    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+  );
+
+  leaderboardDisplay.position.set(20, 20);
+  leaderboardDisplay.anchor.set(0,0);
+  stage.addChild(leaderboardDisplay);
+
+	ticker.add(function (deltaTime) {
+		// console.log(ticker.elapsedMS);
+		if(countdown > 0){
+			countdown = countdown - deltaTime*ticker.elapsedMS/1000;
+			timeDisplay.text = "Time: " + Math.round(countdown);
+		}
+
+    playerCountDisplay.text = "Player count: " + playerCount;
+    scoreDisplay.text = "Score: " + score;
+
+
+		renderer.render(stage);
+	});
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dots Logic
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var dots = new PIXI.Container();
+stage.addChild(dots);
+dots.x = (window.innerWidth / 2) - 360;
+dots.y = (window.innerHeight / 2) - 360;
 
 /*
  * Dots Logic controller.
@@ -64,8 +140,8 @@ for(var i = 0; i < 40; i++) {
 // Rerender grid
 DotsControl.drawGrid = function(board) {
   // parse response grid
-  for (var i = 0; i < 10; i++) {
-    for(var j = 0; j < 10; j++) {
+  for (var i = 0; i < 16; i++) {
+    for(var j = 0; j < 16; j++) {
       var circle = new PIXI.Graphics();
       circle.interactive = true;
       circle.on('mouseover', onMouseOver).on('mousedown', onMouseDown).on('mouseup', onMouseUp);
@@ -77,8 +153,8 @@ DotsControl.drawGrid = function(board) {
       circle.j = j;
       circle.connected = false;
       circle.hitArea = new PIXI.Rectangle(-10, -10, 20, 20);
-      circle.x = 20 + 50 * i;
-      circle.y = 20 + 50 * j;
+      circle.x = 20 + 45 * i;
+      circle.y = 20 + 45 * j;
       dots.addChild(circle);
       DotsControl.grid[i][j] = circle;
     }
@@ -102,8 +178,6 @@ DotsControl.hoverDot = function(dot) {
     }
   }
 }
-
-
 
 /*
  * Check if a dot can connect to other
@@ -179,9 +253,13 @@ onMouseDown = function() {
 	DotsControl.hoverDot(this);
 }
 
+
 onMouseOver = function() {
 	console.log('over')
 	if(DotsControl.isMouseDown === true) {
 		DotsControl.hoverDot(this);
 	}
 }
+
+DotsControl.onTouchDown = DotsControl.onMouseDown;
+DotsControl.onTouchUp   = DotsControl.onMouseUp;
