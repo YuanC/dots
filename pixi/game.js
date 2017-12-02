@@ -29,7 +29,7 @@ var countdown, timeDisplay;
 function initialize(data){
 
   resetBoard(data);
-  timer();
+  initUI();
 	ticker.start();
 
 }
@@ -40,7 +40,7 @@ function resetBoard(data) {
 }
 
 //TIME, SCORE, PLAYER COUNT, NAME CHANGE AND LEADERBOARD
-function timer(){
+function initUI(){
 	timeDisplay = new PIXI.Text(
 			"Time: " + countdown.toString(),
 			{fontFamily: "Arial", fontSize: 32, fill: "black"}
