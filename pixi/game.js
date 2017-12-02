@@ -26,19 +26,24 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 var countdown, timeDisplay;
 
-function initialize(){
+function initialize(data){
 
-	timer();
-  DotsControl.drawGrid(data.board);
+  resetBoard(data);
+  timer();
 	ticker.start();
 
+}
+
+function resetBoard(data) {
+  countdown = data.time;
+  DotsControl.drawGrid(data.board);
 }
 
 //TIME, SCORE, PLAYER COUNT, NAME CHANGE AND LEADERBOARD
 function timer(){
 	timeDisplay = new PIXI.Text(
 			"Time: " + countdown.toString(),
-			{fontFamily: "Arial", fontSize: 32, fill: "white"}
+			{fontFamily: "Arial", fontSize: 32, fill: "black"}
 		);
 
 	timeDisplay.position.set(54, 96);
