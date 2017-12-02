@@ -9,7 +9,7 @@ app.use(express.static('pixi'))
 app.get('/*', (req,res) => res.sendFile(__dirname + '/index.html'))
 
 let board, players, leaderboard, time, temp = 0
-const BOARD_SIZE = 20, ROUND_TIME = 30
+const BOARD_SIZE = 20, ROUND_TIME = 60
 
 io.on('connection', (socket) => {
 
@@ -32,10 +32,15 @@ io.on('connection', (socket) => {
 
   socket.on('clear_dots', (dots) => {
 
-    // delete dots
+    for (let dot of dots) {
+      board[dot[x]][dot[y]] = null
+    }
+
+    cols = 
+
     // move dots down
+
     // regenerate buffer
-    // update user score
 
     players[socket.id]['score'] += dots.length
 
@@ -56,12 +61,11 @@ function init () {
   time = ROUND_TIME
 
   setInterval(() => {
-      time -= 1
+      time--
 
       if (time <= 0) {
         generateBoard()
 
-        // create new board
         // calculate leaderboard
         // reset user scores
         time = ROUND_TIME
