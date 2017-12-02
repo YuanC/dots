@@ -18,15 +18,15 @@ io.on('connection', (socket) => {
     players[socket.id] = {'score': 0, 'uname': 'player' + temp++}
     socket.emit('connect_success', {board, leaderboard, time, 'player': players[socket.id], 'player_count': Object.keys(players).length})
     socket.broadcast.emit('player_count_change', Object.keys(players).length)
-    console.log('connections' + Object.keys(players).length)
+    console.log('Users Connected: ' + Object.keys(players).length)
 
   })
 
-  socket.on('player_disconnect', () => {
+  socket.on('disconnect', () => {
 
     delete players[socket.id]
     socket.broadcast.emit('player_count_change', Object.keys(players).length)
-    console.log('connections: ' + Object.keys(players).length)
+    console.log('Users Connected: ' + Object.keys(players).length)
 
   })
 
