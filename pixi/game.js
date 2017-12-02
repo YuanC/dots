@@ -193,7 +193,7 @@ DotsControl.releaseDots = function() {
 
 	for(i in DotsControl.connectedDots) {
 		var dot = DotsControl.connectedDots[i];
-		editedDots['dots'].push({'y': dot.i + 16, 'x': dot.j + 16});
+		editedDots['dots'].push({'y': dot.j + 16, 'x': dot.i + 16});
 		dot.connected = false;
 	}
 	socket.emit('clear_dots', editedDots);
