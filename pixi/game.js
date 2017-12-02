@@ -16,6 +16,26 @@ var timeDisplay, scoreDisplay, nameDisplay, playerCountDisplay, leaderboardDispl
 var countdown, score, name, playerCount, leaderboard; 
 var textColor = "0x375E53";
 
+// Load google fonts
+window.WebFontConfig = {
+    google: {
+        families: ['Oxygen']
+    }
+};
+
+// include the web-font loader script
+/* jshint ignore:start */
+(function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+        '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+})();
+/* jshint ignore:end */
+
 function initialize(data){
 
   resetBoard(data);
@@ -36,7 +56,7 @@ function resetBoard(data) {
 function initUI(){
 	timeDisplay = new PIXI.Text(
 		"Time: " + countdown,
-		{fontFamily: "Arial", fontSize: 32, fill: textColor}
+		{fontFamily: 'Oxygen', fontSize: 32, fill: textColor}
 	);
 
 	timeDisplay.anchor.set(0.5, 0);
@@ -45,7 +65,7 @@ function initUI(){
 
   scoreDisplay = new PIXI.Text(
     "Score: " + score,
-    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+    {fontFamily: 'Oxygen', fontSize: 32, fill: textColor}
   );
 
   scoreDisplay.anchor.set(1, 0);
@@ -54,7 +74,7 @@ function initUI(){
 
   nameDisplay = new PIXI.Text(
     "Name: " + name,
-    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+    {fontFamily: 'Oxygen', fontSize: 32, fill: textColor}
   );
 
   nameDisplay.anchor.set(1);
@@ -63,7 +83,7 @@ function initUI(){
 
   playerCountDisplay = new PIXI.Text(
     "Player count: " + playerCount,
-    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+    {fontFamily: 'Oxygen', fontSize: 32, fill: textColor}
   );
 
   playerCountDisplay.anchor.set(0, 1);
@@ -72,7 +92,7 @@ function initUI(){
 
   leaderboardDisplay = new PIXI.Text(
     "Leaderboard: " + leaderboard,
-    {fontFamily: "Arial", fontSize: 32, fill: textColor}
+    {fontFamily: 'Oxygen', fontSize: 32, fill: textColor}
   );
 
   leaderboardDisplay.position.set(20, 20);
