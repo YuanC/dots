@@ -27,7 +27,7 @@ var stage = new PIXI.Container();
 var countdown, timeDisplay;
 
 function initialize(){
-	
+
 	timer();
   DotsControl.drawGrid(data.board);
 	ticker.start();
@@ -53,25 +53,6 @@ function timer(){
 		renderer.render(stage);
 	});
 }
-
-// setInterval(function(){
-// 	console.log("changing time");
-// 	if(countdown > 0){
-// 		countdown = countdown - 1;
-// 		timeDisplay.text = "Time: " + countdown.toString();
-// 	}
-// },1000)
-
-
-
-
-
-
-
-
-
-
-
 
 var dots = new PIXI.Container();
 stage.addChild(dots);
