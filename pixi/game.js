@@ -141,7 +141,7 @@ DotsControl.drawGrid = function(board) {
       circle.i = i;
       circle.j = j;
       circle.connected = false;
-      circle.hitArea = new PIXI.Rectangle(-10, -10, 20, 20);
+      circle.hitArea = new PIXI.Rectangle(-30, -30, 60, 60);
       circle.x = 20 + 45 * i;
       circle.y = 20 + 45 * j;
       dots.addChild(circle);
@@ -193,7 +193,7 @@ DotsControl.releaseDots = function() {
 
 	for(i in DotsControl.connectedDots) {
 		var dot = DotsControl.connectedDots[i];
-		editedDots['dots'].push({'y': dot.j + 16, 'x': dot.i + 16});
+		editedDots['dots'].push({'y': dot.i + 16, 'x': dot.j + 16});
 		dot.connected = false;
 	}
 	socket.emit('clear_dots', editedDots);
