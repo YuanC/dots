@@ -4,7 +4,6 @@ socket.on('connect_success', function (data) {
   console.log(data);
   countdown = data.time;
   initialize();
-  DotsControl.drawGrid(data.board);
 })
 
 socket.on('player_count_change', function (data) {
@@ -18,7 +17,7 @@ socket.on('clear_dots', function (data) {
 socket.on('end_round', function (data) {
   console.log(data);
   countdown = data.time;
-  drawGrid(data.board);
+  initialize();
 })
 
 function initSocket() {

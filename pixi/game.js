@@ -29,7 +29,7 @@ var countdown, timeDisplay;
 function initialize(){
 	
 	timer();
-
+  DotsControl.drawGrid(data.board);
 	ticker.start();
 
 }
