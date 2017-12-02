@@ -44,12 +44,12 @@ io.on('connection', (socket) => {
 
     for (let col in cols) {
       if (cols.hasOwnProperty(col)) {
-        // Move Dots Down
 
+        // Move Dots Down
         applyGravity(col)
 
-        fillColBuffer(col)
         // regenerate buffer
+        fillColBuffer(col)
       } 
     }
 
@@ -100,8 +100,9 @@ function init () {
 
 function fillColBuffer (col) {
   for (let j = BOARD_SIZE*2; j >= 0; j--) {
-
-
+    if (!board[col][j]) {
+      board[col][j] = Math.floor(Math.random()*5)
+    }
   }
 }
 
@@ -110,9 +111,12 @@ function applyColGravity (col) {
     if (!board[col][j]) {
       temp = j - 1
 
-      while (!temp) {
-
+      while (!board[col][temp]) {
+        temp = temp - 1
       }
+
+      board[col][j] = board[col][temp]
+      board[col][temp] = null
     }
   }
 }
