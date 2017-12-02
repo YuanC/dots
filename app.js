@@ -8,14 +8,14 @@ const PORT = process.env.PORT || 5000
 app.use(express.static('pixi'))
 app.get('/*', (req,res) => res.sendFile(__dirname + '/index.html'))
 
-let board, players, leaderboard, time
-const BOARD_SIZE = 20
+let board, players, leaderboard, time, temp = 0
+const BOARD_SIZE = 20, ROUND_TIME = 30
 
 io.on('connection', (socket) => {
 
   socket.on('player_connect', () => { // e.g. "toronto"
 
-    players[socket.id] = {'score': 0, 'uname': socket.id}
+    players[socket.id] = {'score': 0, 'uname': 'player' + temp++}
     socket.emit('connect_success', {board, leaderboard, time, 'player': players[socket.id], 'player_count': Object.keys(players).length})
     socket.broadcast.emit('player_count_change', Object.keys(players).length)
     console.log('connections' + Object.keys(players).length)
@@ -53,7 +53,7 @@ function init () {
   generateBoard()
   players = {}
   leaderboard = []
-  time = 30
+  time = ROUND_TIME
 
   setInterval(() => {
       time -= 1
@@ -64,7 +64,7 @@ function init () {
         // create new board
         // calculate leaderboard
         // reset user scores
-
+        time = ROUND_TIME
         io.sockets.emit('end_round', {board, leaderboard, time})
 
       }
@@ -85,7 +85,7 @@ function generateBoard () {
   }
 }
 
-function fillBufferForCol (col) {
+function fillColBuffer (col) {
   for (let j = BOARD_SIZE*2; j >= 0; j--) {
 
   }
