@@ -63,11 +63,21 @@ function init () {
   setInterval(() => {
       time--
 
-      if (time <= 0) {
+      if (time <= 0) { // Round is over
         generateBoard()
 
-        // calculate leaderboard
+        // Calculate Leaderboard for Round
+        player_arr = Object.keys(players).map(key => obj[key]) 
+        player_arr.sort((a, b) => a.score - b.score)
+        leaderboard = player_arr
+
         // reset user scores
+        for (let p_id in players) {
+          if (players.hasOwnProperty(p_id)) {
+            players[p_id]['score'] = 0
+          }
+        }
+
         time = ROUND_TIME
         io.sockets.emit('end_round', {board, leaderboard, time})
 
