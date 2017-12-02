@@ -1,5 +1,6 @@
 //Create the renderer
 var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, this.options);
+var ticker = new PIXI.ticker.Ticker();
 renderer.backgroundColor = 0x061639;
 renderer.view.style.position = "absolute";
 renderer.view.style.display = "block";
@@ -11,10 +12,16 @@ document.body.appendChild(renderer.view);
 
 //Create a container object called the `stage`
 var stage = new PIXI.Container();
+var countdown, timeDisplay;
 
-drawGrid();
+function initialize(){
 
+	drawGrid();
+	timer();
 
+	ticker.start();
+
+}
 
 function drawGrid() {
 	var grid = new Array(10);
@@ -33,3 +40,43 @@ function drawGrid() {
 	}
 	renderer.render(stage);
 }
+
+//TIME, SCORE, PLAYER COUNT, NAME CHANGE AND LEADERBOARD
+function timer(){
+	timeDisplay = new PIXI.Text(
+			"Time: " + countdown.toString(),
+			{fontFamily: "Arial", fontSize: 32, fill: "white"}
+		);
+
+	timeDisplay.position.set(54, 96);
+	stage.addChild(timeDisplay);
+
+	ticker.add(function (time) {
+		// console.log(ticker.elapsedMS);
+		if(countdown > 0){
+			countdown = countdown - time*ticker.elapsedMS/1000;
+			timeDisplay.text = "Time: " + Math.round(countdown);
+		}
+		renderer.render(stage);
+	});
+}
+
+// setInterval(function(){
+// 	console.log("changing time");
+// 	if(countdown > 0){
+// 		countdown = countdown - 1;
+// 		timeDisplay.text = "Time: " + countdown.toString();
+// 	}
+// },1000)
+
+
+
+
+
+
+
+
+
+
+
+
