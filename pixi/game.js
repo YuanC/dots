@@ -7,18 +7,6 @@ renderer.view.style.display = "block";
 renderer.autoResize = true;
 renderer.resize(window.innerWidth, window.innerHeight);
 
-var colorDict = {
-	'0': 0xff4d4d,
-	'1': 0x8cff66,
-	'2': 0x6699ff,
-	'3': 0xffff00,
-	'4': 0x8000ff,
-};
-var grid = Array(40)
-for(var i = 0; i < 40; i++) {
-	grid[i] = Array(20);
-}
-
 // Add the canvas to the HTML document
 document.body.appendChild(renderer.view);
 
@@ -130,7 +118,7 @@ var colorDict = {
   '0': 0xff4d4d,
   '1': 0x8cff66,
   '2': 0x6699ff,
-  '3': 0xffff00,
+  '3': 0xFF8C00,
   '4': 0x8000ff,
 };
 DotsControl.grid = Array(40)
@@ -146,10 +134,10 @@ DotsControl.drawGrid = function(board) {
       var circle = new PIXI.Graphics();
       circle.interactive = true;
       circle.on('mouseover', onMouseOver).on('mousedown', onMouseDown).on('mouseup', onMouseUp);
-      circle.beginFill(colorDict[board[i][j].toString()]);
+      circle.beginFill(colorDict[board[16 + i][j].toString()]);
       circle.drawCircle(0, 0, 10);
       circle.endFill();
-      circle.color = colorDict[board[i][j].toString()];
+      circle.color = colorDict[board[16 + i][j].toString()];
       circle.i = i;
       circle.j = j;
       circle.connected = false;
@@ -174,6 +162,10 @@ DotsControl.hoverDot = function(dot) {
       this.connectedDots.push(dot);
       console.log(this.connectedDots);
       dot.connected = true;
+    }
+    if(dot.connected === true) {
+    	console.log('is loop');
+    	DotsControl.isLoop = true;
     }
 
     if (length > 0) {
@@ -201,7 +193,7 @@ DotsControl.releaseDots = function() {
 
 	for(i in DotsControl.connectedDots) {
 		var dot = DotsControl.connectedDots[i];
-		editedDots['dots'].push({'y': dot.i, 'x': dot.j});
+		editedDots['dots'].push({'y': dot.i + 16, 'x': dot.j + 16});
 		dot.connected = false;
 	}
 	socket.emit('clear_dots', editedDots);
