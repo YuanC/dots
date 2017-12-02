@@ -9,7 +9,7 @@ app.use(express.static('pixi'))
 app.get('/*', (req,res) => res.sendFile(__dirname + '/index.html'))
 
 let board, players, leaderboard, time, temp = 0
-const BOARD_SIZE = 20, ROUND_TIME = 30
+const BOARD_SIZE = 20, ROUND_TIME = 60
 
 io.on('connection', (socket) => {
 
@@ -32,10 +32,26 @@ io.on('connection', (socket) => {
 
   socket.on('clear_dots', (dots) => {
 
-    // delete dots
-    // move dots down
-    // regenerate buffer
-    // update user score
+    cols = {}
+
+    for (let dot of dots) {
+      board[dot[x]][dot[y]] = null
+
+      if (!dot[y] in cols) {
+        cols[y] = true
+      }
+    }
+
+    for (let col in cols) {
+      if (cols.hasOwnProperty(col)) {
+
+        // Move Dots Down
+        applyGravity(col)
+
+        // regenerate buffer
+        fillColBuffer(col)
+      } 
+    }
 
     players[socket.id]['score'] += dots.length
 
@@ -56,24 +72,54 @@ function init () {
   time = ROUND_TIME
 
   setInterval(() => {
-      time -= 1
+    time--
 
-      if (time <= 0) {
-        generateBoard()
+    if (time <= 0) { // Round is over
+      generateBoard()
 
-        // create new board
-        // calculate leaderboard
-        // reset user scores
-        time = ROUND_TIME
-        io.sockets.emit('end_round', {board, leaderboard, time})
+      // Calculate Leaderboard for Round
+      player_arr = Object.keys(players).map(key => players[key]) 
+      player_arr.sort((a, b) => a.score - b.score)
+      leaderboard = player_arr
 
+      // reset user scores
+      for (let p_id in players) {
+        if (players.hasOwnProperty(p_id)) {
+          players[p_id]['score'] = 0
+        }
       }
 
-    }, 1000)
+      time = ROUND_TIME
+      io.sockets.emit('end_round', {board, leaderboard, time})
+
+    }
+
+  }, 1000)
 
 }
 
-init()
+function fillColBuffer (col) {
+  for (let j = BOARD_SIZE*2; j >= 0; j--) {
+    if (!board[col][j]) {
+      board[col][j] = Math.floor(Math.random()*5)
+    }
+  }
+}
+
+function applyColGravity (col) {
+  for (let j = BOARD_SIZE*2; j >= 0; j--) {
+    if (!board[col][j]) {
+      temp = j - 1
+
+      while (!board[col][temp]) {
+        temp = temp - 1
+      }
+
+      board[col][j] = board[col][temp]
+      board[col][temp] = null
+    }
+  }
+}
 
 function generateBoard () {
   board = []
@@ -85,11 +131,6 @@ function generateBoard () {
   }
 }
 
-function fillColBuffer (col) {
-  for (let j = BOARD_SIZE*2; j >= 0; j--) {
-
-  }
-}
-
+init()
 http.listen(PORT, () => console.log('Listening on port ' + PORT))
 
