@@ -15,7 +15,7 @@ socket.on('clear_dots', function (data) {
 
 socket.on('end_round', function (data) {
   console.log(data)
-  drawGrid(data.board);
+  DotsControl.drawGrid(data.board);
 })
 
 function initSocket() {

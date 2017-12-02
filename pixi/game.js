@@ -26,6 +26,14 @@ var stage = new PIXI.Container();
 var dots = new PIXI.Container();
 stage.addChild(dots);
 
+var line = new PIXI.Graphics();
+
+line.beginFill(colorDict['0']);
+line.lineStyle(5, colorDict['0']);
+line.moveTo(25, 25);
+line.lineTo(50, 50);
+line.endFill();
+dots.addChild(line);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dots Logic
@@ -34,7 +42,7 @@ stage.addChild(dots);
 /*
  * Dots Logic controller.
 */
-var DotsControl = {
+DotsControl = {
   connectedDots: [],
   lines: [],
   isMouseDown: false,
@@ -60,10 +68,14 @@ DotsControl.drawGrid = function(board) {
     for(var j = 0; j < 10; j++) {
       var circle = new PIXI.Graphics();
       circle.interactive = true;
+      circle.on('mouseover', onMouseOver).on('mousedown', onMouseDown).on('mouseup', onMouseUp);
       circle.beginFill(colorDict[board[i][j].toString()]);
       circle.drawCircle(0, 0, 10);
       circle.endFill();
       circle.color = colorDict[board[i][j].toString()];
+      circle.i = i;
+      circle.j = j;
+      circle.connected = false;
       circle.hitArea = new PIXI.Rectangle(-10, -10, 20, 20);
       circle.x = 20 + 50 * i;
       circle.y = 20 + 50 * j;
@@ -77,72 +89,99 @@ DotsControl.drawGrid = function(board) {
 // 
 DotsControl.hoverDot = function(dot) {
   var length = this.connectedDots.length;
-
-  if (length == 0 || dot.canConnect(this.connectedDots[length - 1])) {
+  console.log(this.connectedDots.length);
+  if (length == 0 || DotsControl.canConnect(this.connectedDots[length - 1].i, this.connectedDots[length - 1].j, dot.i, dot.j)) {
     if (dot.connected !== true) {
       this.connectedDots.push(dot);
       dot.connected = true;
-    } else {
-      DotsController.increasePoints(1);
     }
 
     if (length > 0) {
       // Connects to the last dot
-      dot.connectTo(this.connectedDots[length - 1]);
+      drawLineTo(this.connectedDots[length - 1].i, this.connectedDots[length - 1].j, dot.i, dot.j);
     }
-
-    dot.animateHover();
   }
 }
+
+
 
 /*
  * Check if a dot can connect to other
 */
 DotsControl.canConnect = function(i1, j1, i2, j2) {
-  var distance = 0.0;
+	var distance = 0.0;
+	distance = Math.pow((j1 - j2), 2);
+	distance = distance + Math.pow((i1 - i2), 2);
+	distance = Math.sqrt(distance);
 
-  distance = Math.pow((j1 - j2), 2);
-  distance = distance + Math.pow((i1 - i2), 2);
-  distance = Math.sqrt(distance);
+	console.log(distance <= 1.0);
+	return (distance <= 1.0 && DotsControl.grid[i1][j1].color == DotsControl.grid[i2][j2].color);
+}
 
-  return (distance <= 1.0 && DotsControls.grid[i1][j1] == DotsControls.grid[i2][j2]);
+DotsControl.releaseDots = function() {
+
+	for(i in DotsControl.connectedDots) {
+		var dot = DotsControl.connectedDots[i];
+		dot.connected = false;
+	}
+
+	for (i in DotsControl.lines) {
+		var line = DotsControl.lines[i];
+		line.clear();
+		dots.removeChild(line);
+	}
+
+	DotsControl.lines = [];
+	DotsControl.connectedDots = [];
 }
 
 DotsControl.onMouseDown = function(event) {
-  DotsControl.isMouseDown = true;
+	console.log('down');
+	DotsControl.isMouseDown = true;
 }
 
 DotsControl.onMouseUp = function(event) {
   DotsControl.isMouseDown = false;
-  DotsControl.releaseDots();
 }
 
 DotsControl.onTouchDown = DotsControl.onMouseDown;
 DotsControl.onTouchUp   = DotsControl.onMouseUp;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Helpers
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // draw line of color
 drawLineTo = function(i1, j1, i2, j2) {
-  var line = new PIXI.Graphics();
-  var color = this.element.lineColor;
+	console.log('yo we out here');
+	var line = new PIXI.Graphics();
 
-  line.beginFill(DotsControls.grid[i1][j2].color);
-  line.lineStyle(5, DotsControls.grid[i1][j2].color);
-  line.moveTo(DotsControls.grid[i1][j1].x, DotsControls.grid[i1][j1].y);
-  line.lineTo(DotsControls.grid[i2][j2].x, DotsControls.grid[i2][j2].y);
-  line.endFill();
+	line.beginFill(DotsControl.grid[i1][j2].color);
+	line.lineStyle(5, DotsControl.grid[i1][j2].color);
+	line.moveTo(DotsControl.grid[i1][j1].x, DotsControl.grid[i1][j1].y);
+	line.lineTo(DotsControl.grid[i2][j2].x, DotsControl.grid[i2][j2].y);
+	line.endFill();
 
-  DotsController.lines.push(line);
-  stage.addChild(line);
+	DotsControl.lines.push(line);
+	dots.addChild(line);
+	renderer.render(stage);
 }
 
-DotsControl.onMouseDown = function(event) {
-  DotsControl.isMouseDown = true;
+onMouseUp = function() {
+	console.log('up');
+	DotsControl.onMouseUp(this);
+	DotsControl.releaseDots();
 }
 
-DotsControl.onMouseUp = function(event) {
-  DotsControl.isMouseDown = false;
-  DotsControl.releaseDots();
+onMouseDown = function() {
+	console.log('down')
+	DotsControl.onMouseDown(this);
+	DotsControl.hoverDot(this);
 }
 
-DotsControl.onTouchDown = DotsControl.onMouseDown;
-DotsControl.onTouchUp   = DotsControl.onMouseUp;
+onMouseOver = function() {
+	console.log('over')
+	if(DotsControl.isMouseDown === true) {
+		DotsControl.hoverDot(this);
+	}
+}
