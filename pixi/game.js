@@ -121,6 +121,7 @@ dots.y = (window.innerHeight / 2) - 360;
 DotsControl = {
   connectedDots: [],
   lines: [],
+  isLoop: false,
   isMouseDown: false,
   grid: [],
 }
@@ -162,13 +163,16 @@ DotsControl.drawGrid = function(board) {
   renderer.render(stage);
 }
 
-// 
+/*
+ * Hover over dot to see if connection can be made
+*/
 DotsControl.hoverDot = function(dot) {
   var length = this.connectedDots.length;
   console.log(this.connectedDots.length);
   if (length == 0 || DotsControl.canConnect(this.connectedDots[length - 1].i, this.connectedDots[length - 1].j, dot.i, dot.j)) {
     if (dot.connected !== true) {
       this.connectedDots.push(dot);
+      console.log(this.connectedDots);
       dot.connected = true;
     }
 
@@ -188,16 +192,19 @@ DotsControl.canConnect = function(i1, j1, i2, j2) {
 	distance = distance + Math.pow((i1 - i2), 2);
 	distance = Math.sqrt(distance);
 
-	console.log(distance <= 1.0);
 	return (distance <= 1.0 && DotsControl.grid[i1][j1].color == DotsControl.grid[i2][j2].color);
 }
 
 DotsControl.releaseDots = function() {
 
+	var editedDots = {'loop': DotsControl.isLoop, 'dots': []};
+
 	for(i in DotsControl.connectedDots) {
 		var dot = DotsControl.connectedDots[i];
+		editedDots['dots'].push({'y': dot.i, 'x': dot.j});
 		dot.connected = false;
 	}
+	socket.emit('clear_dots', editedDots);
 
 	for (i in DotsControl.lines) {
 		var line = DotsControl.lines[i];

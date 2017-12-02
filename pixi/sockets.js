@@ -15,6 +15,7 @@ socket.on('score_change', function (data) {
 
 socket.on('clear_dots', function (data) {
   console.log(data)
+  DotsControl.drawGrid(data.board);
 })
 
 socket.on('end_round', function (data) {
