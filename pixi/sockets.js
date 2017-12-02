@@ -15,3 +15,9 @@ socket.on('clear_dots', function (data) {
 socket.on('end_round', function (data) {
   console.log(data)
 })
+
+function initSocket() {
+  socket.emit('player_connect');
+}
+
+window.addEventListener('DOMContentLoaded', initSocket);
