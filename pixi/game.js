@@ -1,4 +1,4 @@
-//import { AsciiFilter, AdvancedBloomFilter, BloomFilter, BulgePinchFilter, ColorReplaceFilter, ConvolutionFilter, CrossHatchFilter, DotFilter, DropShadowFilter, EmbossFilter, GlowFilter, GodrayFilter, OutlineFilter, MultiColorReplaceFilter, PixelateFilter, RGBSplitFilter, ShockwaveFilter, SimpleLightmapFilter, TiltShiftFilter, TiltShiftAxisFilter, TiltShiftXFilter, TiltShiftYFilter, TwistFilter, ZoomBlurFilter } from './pixi-filters.js';
+//import { AsciiFilter, AdvancedBloomFilter, BloomFilter, BulgePinchFilter, ColorReplaceFilter, ConvolutionFilter, CrossHatchFilter, DotFilter, DropShadowFilter, EmbossFilter, GlowFilter, GodrayFilter, OutlineFilter, MultiColorReplaceFilter, PixelateFilter, RGBSplitFilter, ShockwaveFilter, SimpleLightmapFilter, TiltShiftFilter, TiltShiftAxisFilter, TiltShiftXFilter, TiltShiftYFilter, TwistFilter, ZoomBlurFilter } from 'pixi-filters.js';
 
 // Create the renderer
 var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, this.options);
@@ -160,6 +160,8 @@ for(var i = 0; i < 40; i++) {
 // Rerender grid
 DotsControl.drawGrid = function(board) {
   // parse response grid
+  console.log(board);
+  console.log(board[31][2]);
   for (var i = 0; i < 16; i++) {
     for(var j = 0; j < 16; j++) {
       var circle = new PIXI.Graphics();
@@ -223,7 +225,7 @@ DotsControl.releaseDots = function() {
 
 	for(i in DotsControl.connectedDots) {
 		var dot = DotsControl.connectedDots[i];
-		editedDots['dots'].push({'y': dot.i + 16, 'x': dot.j + 16});
+		editedDots['dots'].push({'y': dot.j + 16, 'x': dot.i + 16});
 		dot.connected = false;
 	}
 	socket.emit('clear_dots', editedDots);
