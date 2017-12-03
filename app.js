@@ -36,21 +36,28 @@ io.on('connection', (socket) => {
     cols = {}
     temp_score = 0
     dots_deleted = []
-    console.log(data.dots)
 
-    if (data.loop) { // loop
+    data.dots = data.dots.map(dot => {
+      dot.y = dot.y - BOARD_SIZE
+      return dot
+    })
+    console.log(data.dots)
+    console.log(data.loop)
+
+    if (!data.loop) { // loop
 
       let temp = data.dots[0]
-      let color = board[temp.y][temp.x]
+      let color = board[temp.x][temp.y]
+      // console.log(color)
 
-      for (let i = 0; i < BOARD_SIZE; i++) {
-        for (let j = BOARD_SIZE/2; j < BOARD_SIZE*2; j++) {
-          if (board[i][j] == color) {
+      for (let i = BOARD_SIZE/2; i < BOARD_SIZE*2; i++) {
+        for (let j = 0; j < BOARD_SIZE; j++) {
+          if (board[i][j] === color) {
 
             board[i][j] = null
-            cols[i] = true
+            cols[j] = true
             temp_score++
-            dots_deleted.push({'y': i, 'x': j})
+            dots_deleted.push({'y': j, 'x': i})
 
           }
         }
@@ -63,33 +70,77 @@ io.on('connection', (socket) => {
       dots_deleted = dots
 
       for (let dot of dots) {
-        board[dot.y][dot.x] = null
+        board[dot.x][dot.y] = null
 
-        if (!(dot.x in cols)) {
+        if (!(dot.y in cols)) {
           cols[dot['y']] = true
         }
       }
+
+      // console.log(board)
+      console.log()
 
     }
 
     for (let col in cols) {
       if (cols.hasOwnProperty(col)) {
-        console.log(col)
         applyColGravity(col) // Move Dots Down
         fillColBuffer(col) // regenerate buffer
       } 
     }
 
+    // console.log(board)
+
     players[socket.id]['score'] += temp_score
 
     socket.broadcast.emit('clear_dots', {dots_deleted, board})
     socket.emit('clear_dots', {dots_deleted, board})
+    socket.emit('score_change', players[socket.id]['score'])
 
   })
 
   socket.on('edit_uname', (uname) => { players[socket.id]['uname'] = uname })
 
 })
+
+function applyColGravity (col) {
+  // console.log("COL" + col);
+  for (let j = BOARD_SIZE*2 - 1; j >= BOARD_SIZE; j--) {
+    if (board[j][col] === null) {
+      // console.log("ROW" + j)
+      temp = j - 1
+
+      // console.log(j + ": j")
+      while (board[temp][col] === null) {
+        // console.log(board[temp][col] + ' ' + temp)
+        temp = temp - 1
+      }
+
+      board[j][col] = board[temp][col]
+      board[temp][col] = null
+    }
+  }
+}
+
+function fillColBuffer (col) {
+  for (let j = 0; j < BOARD_SIZE; j++) {
+    if (board[j][col] === null) {
+      // console.log(board[col]);
+      board[j][col] = Math.floor(Math.random()*5)
+    }
+  }
+}
+
+function generateBoard () {
+  board = []
+  for (let i = 0; i < BOARD_SIZE*2; i++) {
+    board.push([])
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      board[i].push(Math.floor(Math.random()*5))
+    }
+  }
+  // console.log(board)
+}
 
 function init () {
 
@@ -122,46 +173,6 @@ function init () {
     }
 
   }, 1000)
-
-}
-
-function applyColGravity (col) {
-  console.log(board[col]);
-  for (let j = BOARD_SIZE*2 - 1; j >= BOARD_SIZE; j--) {
-
-    if (!board[col][j]) {
-      temp = j - 1
-
-      while (!board[col][temp]) {
-        temp = temp - 1
-      }
-
-      board[col][j] = board[col][temp]
-      board[col][temp] = null
-
-    }
-  }
-  // console.log(board[col] + ' ' + board[col][j])
-
-}
-
-function fillColBuffer (col) {
-  for (let j = BOARD_SIZE; j < BOARD_SIZE*2; j++) {
-    if (!board[col][j]) {
-      console.log(board[col]);
-      board[col][j] = Math.floor(Math.random()*5)
-    }
-  }
-}
-
-function generateBoard () {
-  board = []
-  for (let i = 0; i < BOARD_SIZE; i++) {
-    board.push([])
-    for (let j = 0; j < BOARD_SIZE*2; j++) {
-      board[i].push(Math.floor(Math.random()*5))
-    }
-  }
 }
 
 init()
