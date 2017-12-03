@@ -9,7 +9,7 @@ app.use(express.static('pixi'))
 app.get('/*', (req,res) => res.sendFile(__dirname + '/index.html'))
 
 let board, players, leaderboard, time, temp = 0
-const BOARD_SIZE = 16, ROUND_TIME = 10
+const BOARD_SIZE = 16, ROUND_TIME = 30
 
 io.on('connection', (socket) => {
 
@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
     // console.log(data.dots)
     console.log('loop:' + data.loop)
 
-    if (!data.loop) { // loop
+    if (data.loop) { // loop
 
       let temp = data.dots[0]
       let color = board[temp.x][temp.y]

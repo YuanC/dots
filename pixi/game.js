@@ -194,10 +194,9 @@ DotsControl.hoverDot = function(dot) {
   if (length == 0 || DotsControl.canConnect(this.connectedDots[length - 1].i, this.connectedDots[length - 1].j, dot.i, dot.j)) {
     if (dot.connected !== true) {
       this.connectedDots.push(dot);
-      console.log(this.connectedDots);
       dot.connected = true;
     }
-    if(dot.connected === true && this.connectedDots[length - 1] != dot) {
+    else if(containsObject(dot, this.connectedDots) && !(dot.i == this.connectedDots[length - 1].i)) {
     	console.log('is loop');
     	DotsControl.isLoop = true;
     }
@@ -217,19 +216,26 @@ DotsControl.canConnect = function(i1, j1, i2, j2) {
 	distance = distance + Math.pow((i1 - i2), 2);
 	distance = Math.sqrt(distance);
 
-	return (distance <= 1.0 && DotsControl.grid[i1][j1].color == DotsControl.grid[i2][j2].color);
+	return (distance > 0 && distance <= 1.0 && DotsControl.grid[i1][j1].color == DotsControl.grid[i2][j2].color);
 }
 
 DotsControl.releaseDots = function() {
 
 	var editedDots = {'loop': DotsControl.isLoop, 'dots': []};
 
-	for(i in DotsControl.connectedDots) {
-		var dot = DotsControl.connectedDots[i];
-		editedDots['dots'].push({'y': dot.j + 16, 'x': dot.i + 16});
-		dot.connected = false;
+	if(DotsControl.connectedDots.length > 1) {
+		for(i in DotsControl.connectedDots) {
+			var dot = DotsControl.connectedDots[i];
+			editedDots['dots'].push({'y': dot.j + 16, 'x': dot.i + 16});
+			dot.connected = false;
+			socket.emit('clear_dots', editedDots);
+		}
 	}
-	socket.emit('clear_dots', editedDots);
+	else {
+		for(i in DotsControl.connectedDots) {
+			dot.connected = false;
+		}
+	}
 
 	for (i in DotsControl.lines) {
 		var line = DotsControl.lines[i];
@@ -237,6 +243,7 @@ DotsControl.releaseDots = function() {
 		dots.removeChild(line);
 	}
 
+	DotsControl.isLoop = false;
 	DotsControl.lines = [];
 	DotsControl.connectedDots = [];
 }
@@ -270,6 +277,17 @@ function filterOff() {
     //this.filters = [outlineFilterBlue]
 }
 
+function containsObject(obj, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if (list[i] === obj) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // draw line of color
 drawLineTo = function(i1, j1, i2, j2) {
 	var line = new PIXI.Graphics();
@@ -295,9 +313,8 @@ onMouseDown = function() {
 	DotsControl.hoverDot(this);
 }
 
-
 onMouseOver = function() {
-	filterOn();
+	//filterOn();
 	if(DotsControl.isMouseDown === true) {
 		DotsControl.hoverDot(this);
 	}
