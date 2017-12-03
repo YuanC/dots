@@ -9,7 +9,7 @@ app.use(express.static('pixi'))
 app.get('/*', (req,res) => res.sendFile(__dirname + '/index.html'))
 
 let board, players, leaderboard, time, temp = 0
-const BOARD_SIZE = 16, ROUND_TIME = 60
+const BOARD_SIZE = 16, ROUND_TIME = 10
 
 io.on('connection', (socket) => {
 
@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
     socket.emit('connect_success', {board, leaderboard, time, 'player': players[socket.id], 'player_count': Object.keys(players).length})
     socket.broadcast.emit('player_count_change', Object.keys(players).length)
     console.log('Users Connected: ' + Object.keys(players).length)
-    console.log(players)
+    // console.log(players)
 
   })
 
@@ -41,8 +41,8 @@ io.on('connection', (socket) => {
       dot.y = dot.y - BOARD_SIZE
       return dot
     })
-    console.log(data.dots)
-    console.log(data.loop)
+    // console.log(data.dots)
+    // console.log(data.loop)
 
     if (!data.loop) { // loop
 
@@ -77,8 +77,8 @@ io.on('connection', (socket) => {
         }
       }
 
-    console.log(board)
-      console.log()
+    // console.log(board)
+      // console.log()
 
     }
 
@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
       } 
     }
 
-    console.log(board)
+    // console.log(board)
 
     players[socket.id]['score'] += temp_score
 
@@ -157,8 +157,13 @@ function init () {
 
       // Calculate Leaderboard for Round
       player_arr = Object.keys(players).map(key => players[key]) 
-      player_arr.sort((a, b) => a.score - b.score)
+      player_arr.sort((a, b) => b.score - a.score)
+      player_arr = player_arr.slice(0,5)
       leaderboard = player_arr
+
+
+      time = ROUND_TIME
+      io.sockets.emit('end_round', {board, leaderboard, time})
 
       // reset user scores
       for (let p_id in players) {
@@ -166,9 +171,6 @@ function init () {
           players[p_id]['score'] = 0
         }
       }
-
-      time = ROUND_TIME
-      io.sockets.emit('end_round', {board, leaderboard, time})
 
     }
 
