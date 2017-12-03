@@ -9,7 +9,7 @@ app.use(express.static('pixi'))
 app.get('/*', (req,res) => res.sendFile(__dirname + '/index.html'))
 
 let board, players, leaderboard, time, temp = 0
-const BOARD_SIZE = 16, ROUND_TIME = 30
+const BOARD_SIZE = 16, ROUND_TIME = 60
 
 io.on('connection', (socket) => {
 
