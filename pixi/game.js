@@ -1,3 +1,5 @@
+//import { AsciiFilter, AdvancedBloomFilter, BloomFilter, BulgePinchFilter, ColorReplaceFilter, ConvolutionFilter, CrossHatchFilter, DotFilter, DropShadowFilter, EmbossFilter, GlowFilter, GodrayFilter, OutlineFilter, MultiColorReplaceFilter, PixelateFilter, RGBSplitFilter, ShockwaveFilter, SimpleLightmapFilter, TiltShiftFilter, TiltShiftAxisFilter, TiltShiftXFilter, TiltShiftYFilter, TwistFilter, ZoomBlurFilter } from './pixi-filters.js';
+
 // Create the renderer
 var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, this.options);
 var ticker = new PIXI.ticker.Ticker();
@@ -99,9 +101,11 @@ function initUI(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var dots = new PIXI.Container();
+var desiredHeight = window.innerHeight * 0.7;
+var split = desiredHeight / 16.0;
 stage.addChild(dots);
-dots.x = (window.innerWidth / 2) - 360;
-dots.y = (window.innerHeight / 2) - 360;
+dots.x = (window.innerWidth / 2) - (desiredHeight / 2);
+dots.y = (window.innerHeight / 2) - (desiredHeight / 2);
 
 /*
  * Dots Logic controller.
@@ -142,8 +146,8 @@ DotsControl.drawGrid = function(board) {
       circle.j = j;
       circle.connected = false;
       circle.hitArea = new PIXI.Rectangle(-30, -30, 60, 60);
-      circle.x = 20 + 45 * i;
-      circle.y = 20 + 45 * j;
+      circle.x = 20 + split * j;
+      circle.y = 20 + split * i;
       dots.addChild(circle);
       DotsControl.grid[i][j] = circle;
     }
@@ -163,11 +167,10 @@ DotsControl.hoverDot = function(dot) {
       console.log(this.connectedDots);
       dot.connected = true;
     }
-    if(dot.connected === true) {
+    if(dot.connected === true && this.connectedDots[length - 1] != dot) {
     	console.log('is loop');
     	DotsControl.isLoop = true;
     }
-
     if (length > 0) {
       // Connects to the last dot
       drawLineTo(this.connectedDots[length - 1].i, this.connectedDots[length - 1].j, dot.i, dot.j);
@@ -209,7 +212,6 @@ DotsControl.releaseDots = function() {
 }
 
 DotsControl.onMouseDown = function(event) {
-	console.log('down');
 	DotsControl.isMouseDown = true;
 }
 
@@ -224,9 +226,22 @@ DotsControl.onTouchUp   = DotsControl.onMouseUp;
 // Helpers
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//var outlineFilterRed = new PIXI.filters.BloomFilter(15, 2, 1, 0xff9999, 0.5)
+// var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5)
+// var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5)
+// var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5)
+// var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5)
+
+function filterOn() {
+    //this.filters = [outlineFilterRed]
+}
+
+function filterOff() {
+    //this.filters = [outlineFilterBlue]
+}
+
 // draw line of color
 drawLineTo = function(i1, j1, i2, j2) {
-	console.log('yo we out here');
 	var line = new PIXI.Graphics();
 
 	line.beginFill(DotsControl.grid[i1][j2].color);
@@ -241,20 +256,18 @@ drawLineTo = function(i1, j1, i2, j2) {
 }
 
 onMouseUp = function() {
-	console.log('up');
 	DotsControl.onMouseUp(this);
 	DotsControl.releaseDots();
 }
 
 onMouseDown = function() {
-	console.log('down')
 	DotsControl.onMouseDown(this);
 	DotsControl.hoverDot(this);
 }
 
 
 onMouseOver = function() {
-	console.log('over')
+	filterOn();
 	if(DotsControl.isMouseDown === true) {
 		DotsControl.hoverDot(this);
 	}
