@@ -40,6 +40,7 @@ window.WebFontConfig = {
 
 function initialize(data){
 
+  name = data.player.uname;
   resetBoard(data);
   initUI();
 	ticker.start();
@@ -48,11 +49,10 @@ function initialize(data){
 
 function resetBoard(data) {
   leaderboard = data.leaderboard;
-  console.log(leaderboard);
+  // console.log(leaderboard);
   countdown = data.time;
-  name = data.player.uname;
   playerCount = data.player_count;
-  score = data.player.score;
+  score = 0;
   DotsControl.drawGrid(data.board);
 }
 
@@ -113,10 +113,11 @@ function initUI(){
     playerCountDisplay.text = "Player count: " + playerCount;
     scoreDisplay.text = "Score: " + score;
 
-    leaderboardDisplay = "Leaderboard: ";
+    leaderboardDisplay.text = "Leaderboard: ";
 
     leaderboard.forEach(function (person) {
-      leaderboardDisplay += "\n" + person.uname;
+      // console.log(person);
+      leaderboardDisplay.text += "\n" + person.uname + " - " + person.score;
     });
 
 		renderer.render(stage);
