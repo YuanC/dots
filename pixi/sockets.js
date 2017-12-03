@@ -22,7 +22,6 @@ socket.on('end_round', function (data) {
 
   console.log(data)
   DotsControl.drawGrid(data.board);
-  console.log(data);
   resetBoard(data);
 })
 
