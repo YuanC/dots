@@ -77,7 +77,7 @@ io.on('connection', (socket) => {
         }
       }
 
-      // console.log(board)
+    console.log(board)
       console.log()
 
     }
@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
       } 
     }
 
-    // console.log(board)
+    console.log(board)
 
     players[socket.id]['score'] += temp_score
 

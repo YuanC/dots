@@ -45,6 +45,8 @@ function initialize(data){
 }
 
 function resetBoard(data) {
+  leaderboard = data.leaderboard;
+  console.log(leaderboard);
   countdown = data.time;
   name = data.player.uname;
   playerCount = data.player_count;
@@ -109,6 +111,11 @@ function initUI(){
     playerCountDisplay.text = "Player count: " + playerCount;
     scoreDisplay.text = "Score: " + score;
 
+    leaderboardDisplay = "Leaderboard: ";
+
+    leaderboard.forEach(function (person) {
+      leaderboardDisplay += "\n" + person.uname;
+    });
 
 		renderer.render(stage);
 	});
