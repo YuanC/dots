@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
       return dot
     })
     // console.log(data.dots)
-    // console.log(data.loop)
+    console.log('loop:' + data.loop)
 
     if (!data.loop) { // loop
 
